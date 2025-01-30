@@ -93,7 +93,7 @@ def main():
         finetune_decoder=True
     )
     model = modelHelper.get_model()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device("cpu")
     model.to(device)
     model.train()
 

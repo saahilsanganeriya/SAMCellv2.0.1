@@ -12,7 +12,7 @@ import matplotlib.colors as mcolors
 from cellpose.dynamics import masks_to_flows
 
 class SAMDataset(Dataset):
-    def __init__(self, img_path, flow_path, ann_path, processor, weight_path=None, crop_size=256, device = torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+    def __init__(self, img_path, flow_path, ann_path, processor, weight_path=None, crop_size=256, device = torch.device('cuda') if torch.cuda.is_available() else torch.device("cpu")):
         self.imgs = np.load(img_path)
         self.flows = np.load(flow_path)
         self.anns = np.load(ann_path)

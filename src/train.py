@@ -37,7 +37,7 @@ def main():
     model = modelHelper.get_model()
 
     print('training...')
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device("cpu")
     model.to(device)
 
     optimizer = AdamW(model.parameters(), lr=1e-4, weight_decay=0.1, betas=(0.9, 0.999))
