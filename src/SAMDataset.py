@@ -101,24 +101,24 @@ class SAMDataset(Dataset):
         flow_dx = flows_2d[1]
         flow_dy = flows_2d[0]
 
-        # -- 2) Compute a "cell probability" channel using a distance transform
-        #    (distance from boundary). We do this on the binary mask of all cells.
-        binary_mask = (ann > 0).astype(np.uint8)
-        # Distance transform needs a binary image, 0 for background, 1 for foreground
-        dist_map = cv2.distanceTransform(binary_mask, distanceType=cv2.DIST_L2, maskSize=3)
+        dist_map = np.zeros_like(ann, dtype=np.float32)
+        for cell in np.unique(ann):
+            if cell == 0:
+                continue  # skip background
 
-        # Normalize to [0,1] to get "cell probability"-like
-        max_dist = dist_map.max()
-        if max_dist > 0:
-            dist_map /= max_dist
-
-        # We call dist_map the "cell_prob" channel
-        cell_prob = dist_map.astype(np.float32)
+            cell_mask = (ann == cell).astype(np.uint8)
+            # compute distance from every pixel to the centroid
+            cell_map = cv2.distanceTransform(cell_mask, cv2.DIST_L2, 3).astype(np.float32)
+            cell_map = cell_map / np.max(cell_map)
+            # dist_map = 1 - dist_map
+            cell_map = cell_map * cell_mask
+            # add to ann
+            dist_map[cell_mask > 0] = cell_map[cell_mask > 0]
 
         # Stack them into [3, H, W]
         # channel 0 = dx, channel 1 = dy, channel 2 = cell_prob
 
-        label = np.stack([flow_dx, flow_dy, cell_prob], axis=0)
+        label = np.stack([flow_dx, flow_dy, dist_map], axis=0)
 
         return img, label, weight, ann
 

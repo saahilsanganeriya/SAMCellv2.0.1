@@ -12,6 +12,7 @@ import wandb
 from transformers import SamModel, SamConfig, SamMaskDecoderConfig
 from transformers.models.sam.modeling_sam import SamMaskDecoder, SamVisionConfig
 from transformers.models.sam import convert_sam_original_to_hf_format
+from safetensors.torch import load_file
 
 class FinetunedSAM():
     '''a helper class to handle setting up SAM from the transformers library for finetuning
@@ -41,4 +42,10 @@ class FinetunedSAM():
         return self.model
     
     def load_weights(self, weight_path):
+        self.model.load_state_dict(torch.load(weight_path, map_location=torch.device('cuda') if torch.cuda.is_available() else torch.device("cpu")))
+
+    def load_weights_safetensors(self, weight_path):
+        self.model.load_state_dict(load_file(weight_path))
+
+    def load_weights_pt(self, weight_path):
         self.model.load_state_dict(torch.load(weight_path, map_location=torch.device('cuda') if torch.cuda.is_available() else torch.device("cpu")))
